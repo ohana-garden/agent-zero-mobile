@@ -6,13 +6,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.20" apply false
 }
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        maven { url = uri("https://jitpack.io") }
-    }
-}
+// Repositories are configured in settings.gradle.kts
 
 // Common versions for all modules
 extra["compileSdk"] = 35
