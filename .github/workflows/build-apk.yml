@@ -1,0 +1,57 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - 'claude/**'
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-zero-mobile-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
+
+      - name: Create Release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Agent Zero Mobile v1.0.${{ github.run_number }}
+          body: |
+            NSA-Defeating Multi-Agent AI Advisory Team for Android
+
+            **Download the APK below and install on your Android device!**
+
+            Features:
+            - 5 AI Agents with unique personalities
+            - Voice-first interface
+            - Hardware-backed security
+            - P2P mesh networking
+            - Privacy-first design
+          files: app/build/outputs/apk/debug/app-debug.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
